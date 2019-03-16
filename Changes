@@ -4,5 +4,7 @@ Revision history for Perl module ExtUtils::ModuleMaker::Siffra
     - original version; created by ExtUtils::ModuleMaker 0.63
 0.02 2019-03-15 21:02:00
     - Added Carp to use
+0.03 2019-03-16 02:47:00
+    - Better Abstract
 
 

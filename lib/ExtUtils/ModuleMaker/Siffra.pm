@@ -13,7 +13,7 @@ BEGIN
     require ExtUtils::ModuleMaker;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     @ISA     = qw(Exporter ExtUtils::ModuleMaker);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -100,6 +100,7 @@ sub block_begin
     my $strict_line           = "use strict;\n";
     my $warnings_line         = "use warnings;\n";                                           # not included in standard version
     my $carp_line             = "use Carp;\n";
+    my $carp_verbose          = "$Carp::Verbose = 1;\n";
     my $encoding_line         = "use utf8;\n";
     my $data_dumper_line      = "use Data::Dumper;\n";
     my $log_line              = "use Log::Any qw(\$log);\n";
@@ -125,6 +126,7 @@ END_OF_BEGIN
     $text .= $strict_line;
     $text .= $warnings_line         if $self->{ INCLUDE_WARNINGS };
     $text .= $carp_line;
+    $text .= $carp_verbose;
     $text .= $encoding_line;
     $text .= $data_dumper_line;
     $text .= $log_line;
@@ -496,7 +498,7 @@ sub complete_build
 
 =head1 NAME
 
-ExtUtils::ModuleMaker::Siffra - Module abstract (<= 44 characters) goes here
+ExtUtils::ModuleMaker::Siffra - Create a module
 
 =head1 SYNOPSIS
 
