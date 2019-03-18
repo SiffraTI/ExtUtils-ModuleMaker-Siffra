@@ -6,5 +6,6 @@ Revision history for Perl module ExtUtils::ModuleMaker::Siffra
     - Added Carp to use
 0.03 2019-03-16 02:47:00
     - Better Abstract
-
-
+0.04 2019-03-18 01:45:00
+    - Fixed $Carp::Verbose = 1;
+    - Added lines to new() method
