@@ -39,12 +39,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git@github.com:lbenevenuto/ExtUtils-ModuleMaker-Siffra.git',
-                        web  => 'https://github.com/lbenevenuto/ExtUtils-ModuleMaker-Siffra',
+                        url  => 'git@github.com:SiffraTI/ExtUtils-ModuleMaker-Siffra.git',
+                        web  => 'https://github.com/SiffraTI/ExtUtils-ModuleMaker-Siffra',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/ExtUtils-ModuleMaker-Siffra/issues',
+                        web => 'https://github.com/SiffraTI/ExtUtils-ModuleMaker-Siffra/issues',
                     },
                 },
             }

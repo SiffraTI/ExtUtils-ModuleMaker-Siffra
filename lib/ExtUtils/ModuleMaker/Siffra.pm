@@ -240,12 +240,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git\@github.com:lbenevenuto/$nameFormat.git',
-                        web  => 'https://github.com/lbenevenuto/$nameFormat',
+                        url  => 'git\@github.com:SiffraTI/$nameFormat.git',
+                        web  => 'https://github.com/SiffraTI/$nameFormat',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/$nameFormat/issues',
+                        web => 'https://github.com/SiffraTI/$nameFormat/issues',
                     },
                 },
             }
