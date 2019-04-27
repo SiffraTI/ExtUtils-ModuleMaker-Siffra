@@ -3,17 +3,21 @@ package ExtUtils::ModuleMaker::Siffra;
 use 5.014;
 use strict;
 use warnings;
+use Carp;
 use utf8;
 use Data::Dumper;
+use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
+
 
 BEGIN
 {
     require ExtUtils::ModuleMaker;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.01';
+    $VERSION = '0.05';
     @ISA     = qw(Exporter ExtUtils::ModuleMaker);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -23,7 +27,7 @@ BEGIN
 } ## end BEGIN
 
 =head3 C<block_new_method()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -34,7 +38,7 @@ BEGIN
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub block_new_method
@@ -43,7 +47,7 @@ sub block_new_method
     return <<'EOFBLOCK';
 
 =head2 C<new()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -54,28 +58,29 @@ sub block_new_method
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
- 
+
 sub new
 {
     my ($class, %parameters) = @_;
 
     my $self = {};
- 
+    #my $self = $class->SUPER::new( %parameters );
+
     $self = bless ($self, ref ($class) || $class);
 
     $log->info( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
- 
-    $self->_initialize( %parameters );
+
+    #$self->_initialize( %parameters );
     return $self;
 }
- 
+
 EOFBLOCK
 } ## end sub block_new_method
 
 =head3 C<block_begin()>
- 
+
   Usage     : $self->block_begin($module) within text_pm_file()
   Purpose   : Composes the standard code for top of a Perl pm file
   Returns   : String holding code for top of pm file
@@ -87,7 +92,7 @@ EOFBLOCK
               e.g., you don't need Exporter-related code if you're building
               an OO-module.
   Comment   : References $self keys NAME and (indirectly) VERSION
- 
+
 =cut
 
 sub block_begin
@@ -99,12 +104,14 @@ sub block_begin
     my $Id_line               = q{#$Id#} . "\n";
     my $strict_line           = "use strict;\n";
     my $warnings_line         = "use warnings;\n";                                           # not included in standard version
+    my $carp_line             = "use Carp;\n";
+    my $carp_verbose          = "\$Carp::Verbose = 1;\n";
     my $encoding_line         = "use utf8;\n";
     my $data_dumper_line      = "use Data::Dumper;\n";
     my $log_line              = "use Log::Any qw(\$log);\n";
     my $scalar_util_line      = "use Scalar::Util qw(blessed);\n";
     my $begin_block           = <<"END_OF_BEGIN";
- 
+
 BEGIN {
     use Exporter ();
     use vars qw(\$VERSION \@ISA \@EXPORT \@EXPORT_OK \%EXPORT_TAGS);
@@ -115,7 +122,7 @@ BEGIN {
     \@EXPORT_OK   = qw();
     \%EXPORT_TAGS = ();
 }
- 
+
 END_OF_BEGIN
 
     my $text = $package_line;
@@ -123,10 +130,12 @@ END_OF_BEGIN
     $text .= $Id_line               if $self->{ INCLUDE_ID_LINE };
     $text .= $strict_line;
     $text .= $warnings_line         if $self->{ INCLUDE_WARNINGS };
+    $text .= $carp_line;
     $text .= $encoding_line;
     $text .= $data_dumper_line;
     $text .= $log_line;
     $text .= $scalar_util_line;
+    $text .= $carp_verbose;
     $text .= $begin_block;
     return $text;
 } ## end sub block_begin
@@ -210,16 +219,20 @@ my %WriteMakefileArgs = (
     LICENSE          => '$escaped{LICENSE}',
     INSTALLDIRS      => (\$] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM => {
-        'strict'             => 0,
-        'warnings'           => 0,
-        'Test::Simple'       => 0.44,
-        'Test::More'         => 0,
-        'Test::Perl::Critic' => 0,
-        'version'            => 0,
-        'utf8'               => 0,
-        'Log::Any'           => 0,
-        'Scalar::Util'       => 0,
-        'Data::Dumper'       => 0,
+
+        # Default req
+        'strict'       => 0,
+        'warnings'     => 0,
+        'Carp'         => 0,
+        'utf8'         => 0,
+        'Data::Dumper' => 0,
+        'DDP'          => 0,
+        'Log::Any'     => 0,
+        'Scalar::Util' => 0,
+        'version'      => 0,
+        'Test::More'   => 0,
+        # Default req
+
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,
@@ -235,12 +248,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git\@github.com:lbenevenuto/$nameFormat.git',
-                        web  => 'https://github.com/lbenevenuto/$nameFormat',
+                        url  => 'git\@github.com:SiffraTI/$nameFormat.git',
+                        web  => 'https://github.com/SiffraTI/$nameFormat',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/$nameFormat/issues',
+                        web => 'https://github.com/SiffraTI/$nameFormat/issues',
                     },
                 },
             }
@@ -257,7 +270,7 @@ END_OF_MAKEFILE_TEXT
 } ## end sub text_Makefile
 
 =head3 C<pod_wrapper()>
- 
+
   Usage     : $self->pod_wrapper($string) within block_pod()
   Purpose   : When writing POD sections, you have to 'escape'
               the POD markers to prevent the compiler from treating
@@ -269,29 +282,29 @@ END_OF_MAKEFILE_TEXT
   Comment   : $head and $tail inside pod_wrapper() are optional and, in a
               subclass, could be redefined as empty strings;
               but $cutline is mandatory as it supplies the last =cut
- 
+
 =cut
 
 sub pod_wrapper
 {
     my ( $self, $podtext ) = @_;
     my $head = <<'END_OF_HEAD';
- 
+
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.
 ## You better edit it!
- 
+
 END_OF_HEAD
 
     my $cutline = <<'END_OF_CUT';
- 
+
  ====cut
- 
+
 END_OF_CUT
 
     my $tail = <<'END_OF_TAIL';
 #################### main pod documentation end ###################
- 
+
 END_OF_TAIL
 
     my $encoding_section = <<'END_OF_ENCODING_SECTION';
@@ -313,7 +326,7 @@ END_OF_ENCODING_SECTION
 } ## end sub pod_wrapper
 
 =head3 C<text_perlcritic_test()>
- 
+
   Usage     : $self->text_perlcritic_test() within complete_build()
   Purpose   : Composes text for t/pod-coverage.t
   Returns   : String with text of t/pod-coverage.t
@@ -322,7 +335,7 @@ END_OF_ENCODING_SECTION
   Comment   : Adapted from Andy Lester's Module::Starter
   Comment   : I don't think of much of this metric, but Andy and Damian do,
               so if you want it you set INCLUDE_POD_COVERAGE_TEST => 1
- 
+
 =cut
 
 sub text_perlcritic_test
@@ -345,7 +358,7 @@ END_OF_TEXT_PERLCRITIC_TEST_TEST
 } ## end sub text_perlcritic_test
 
 =head3 C<complete_build()>
- 
+
   Usage     : $self->pod_wrapper($string) within block_pod()
   Purpose   : When writing POD sections, you have to 'escape'
               the POD markers to prevent the compiler from treating
@@ -357,7 +370,7 @@ END_OF_TEXT_PERLCRITIC_TEST_TEST
   Comment   : $head and $tail inside pod_wrapper() are optional and, in a
               subclass, could be redefined as empty strings;
               but $cutline is mandatory as it supplies the last =cut
- 
+
 =cut
 
 sub complete_build
@@ -494,7 +507,7 @@ sub complete_build
 
 =head1 NAME
 
-ExtUtils::ModuleMaker::Siffra - Module abstract (<= 44 characters) goes here
+ExtUtils::ModuleMaker::Siffra - Create a module
 
 =head1 SYNOPSIS
 
@@ -543,7 +556,7 @@ LICENSE file included with this module.
 =head1 SEE ALSO
 
 perl(1).
- 
+
 =cut
 
 #################### main pod documentation end ###################
